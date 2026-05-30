@@ -1,0 +1,34 @@
+name: Build Hook DLL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'hookdll/**'
+      - '.github/workflows/build-hookdll.yml'
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - name: Setup VS dev shell
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Build frame_grabber with MinHook
+        shell: cmd
+        run: |
+          cd hookdll
+          set MH=minhook\src
+          set MHI=minhook\include
+          cl /nologo /LD /EHsc /MT /O2 /W3 /guard:cf /CETCOMPAT /I "%MHI%" /Tp frame_grabber.cpp /Tc %MH%\hook.c /Tc %MH%\buffer.c /Tc %MH%\trampoline.c /Tc %MH%\hde\hde32.c /Tc %MH%\hde\hde64.c /link /OUT:frame_grabber.dll d3d11.lib dxgi.lib user32.lib advapi32.lib /GUARD:CF /CETCOMPAT
+          if errorlevel 1 exit /b 1
+          dir *.dll
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HookDLLs
+          path: hookdll/frame_grabber.dll
+          if-no-files-found: error
