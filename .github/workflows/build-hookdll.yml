@@ -27,19 +27,8 @@ jobs:
           cl /nologo /LD /EHsc /MT /O2 /W3 /guard:cf /CETCOMPAT /I "%MHI%" /Tp frame_grabber.cpp /Tc %MH%\hook.c /Tc %MH%\buffer.c /Tc %MH%\trampoline.c /Tc %MH%\hde\hde32.c /Tc %MH%\hde\hde64.c /link /OUT:frame_grabber.dll d3d11.lib dxgi.lib user32.lib advapi32.lib /GUARD:CF /CETCOMPAT
           if errorlevel 1 exit /b 1
           dir *.dll
-      - name: Build hw_protected_target simulator
-        shell: cmd
-        run: |
-          cd hookdll
-          if exist hw_protected_target.cpp (
-            cl /nologo /EHsc /MT /O2 /W3 /guard:cf /CETCOMPAT hw_protected_target.cpp /link /OUT:hw_protected_target.exe d3d11.lib dxgi.lib user32.lib /GUARD:CF /CETCOMPAT /SUBSYSTEM:CONSOLE
-            if errorlevel 1 exit /b 1
-            dir *.exe
-          )
       - uses: actions/upload-artifact@v4
         with:
           name: HookDLLs
-          path: |
-            hookdll/frame_grabber.dll
-            hookdll/hw_protected_target.exe
+          path: hookdll/frame_grabber.dll
           if-no-files-found: error
