@@ -13,6 +13,7 @@
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <stdio.h>
+#include <math.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -73,7 +74,7 @@ static bool CreateSwapChain(int w, int h, UINT flags) {
 static void RenderFrame(float t) {
     // Magenta fill (R=1, G=0, B=1, A=1) - matches our target_wda magenta for visual recognition.
     // Brightness oscillates so we can see frame updates aren't frozen.
-    float v = 0.7f + 0.3f * (float)sin(t * 2.0);
+    float v = 0.7f + 0.3f * sinf(t * 2.0f);
     if (v < 0) v = -v; if (v > 1) v = 1;
     float color[4] = { v, 0.0f, v, 1.0f };
     g_ctx->ClearRenderTargetView(g_rtv.Get(), color);
